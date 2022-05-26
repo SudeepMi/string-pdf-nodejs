@@ -16,8 +16,7 @@ app.post("/get", (req, res) => {
   const { string } = req.body;
   let options = { format: "A4" };
   let file = { content: string };
-  console.log(string);
-
+  
   // deepcode ignore PromiseNotCaughtNode
   html_to_pdf.generatePdf(file, options).then((pdfBuffer) => {
     const random = Math.random();
