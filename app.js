@@ -7,7 +7,6 @@ var html_to_pdf = require("html-pdf-node");
 const multer = require("multer")
 const Document = require('extract-word-docs');
 
-
 app.use(cors());
 
 // parse application/x-www-form-urlencoded
