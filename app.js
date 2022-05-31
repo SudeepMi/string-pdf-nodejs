@@ -6,6 +6,8 @@ const path = require("path");
 var html_to_pdf = require("html-pdf-node");
 const multer = require("multer")
 const Document = require('extract-word-docs');
+const HTMLtoDOCX = require('html-to-docx');
+const express = require("express")
 
 app.use(cors());
 
@@ -14,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
 app.use(bodyParser.json());
+app.use('/public', express.static(__dirname + '/public'));
 
 app.post("/get", (req, res) => {
   const { string } = req.body;
@@ -28,6 +31,36 @@ app.post("/get", (req, res) => {
       .status(200)
       .json({ msg: "OK", file: `${__dirname}/public/${random}.pdf` });
   });
+});
+
+// export doc file
+app.post("/doc", (req, res) => {
+  const random = Math.random() * 10;
+  const filePath = `./public/${random}.docx`
+  if(!fs.existsSync('./public')){
+    fs.mkdirSync('./public');
+  }
+  const { string } = req.body;
+  (async () => {
+    const fileBuffer = await HTMLtoDOCX(string, null, {
+      table: { row: { cantSplit: true } },
+      footer: true,
+      pageNumber: true,
+    });
+  
+    fs.writeFileSync(filePath, fileBuffer, (error) => {
+      if (error) {
+        console.log('Docx file creation failed');
+        return;
+      }
+      console.log('Docx file created successfully');
+    });
+
+  })();
+  res.json({
+    link: `${req.protocol}://${req.get('host')}/${filePath}`
+  }).send()
+  
 });
 
 // deepcode ignore NoRateLimitingForExpensiveWebOperation
